@@ -1,0 +1,35 @@
+[LOGIN]
+email = ernani.torquato@gmail.com
+senha = Vivi@6@9
+
+[AJUSTES]
+valor_entrada = 10
+tipo = automatico
+stop_win = 100
+stop_loss = 200
+volatility_threshold = 0
+analise_medias = N
+velas_medias = 10
+pay_minimo = 70
+ativo = par
+min_volume = 0
+gerenciamento_Rd_trader = N
+gerenciamento_Rd_trader_conservador = S
+
+[MARTINGALE]
+usar_martingale = N
+niveis_martingale = 1
+fator_martingale = 2
+
+[VELAS]
+qnt_velas = 10
+timeframe = 60
+
+[SOROS]
+usar_soros = N
+niveis_soros = 0
+
+[CICLOS]
+usar_ciclo = S
+niveis_ciclo = 5
+fator_ciclo = 2
