@@ -62,18 +62,30 @@ else:
     martingale = 0
 fator_mg = float(config['MARTINGALE']['fator_martingale'])
 
-
 if config['SOROS']['usar_soros'].upper() == 'S':
     soros = True
     niveis_soros = int(config['SOROS']['niveis_soros'])
     nivel_soros = 0
-
 else:
     soros = False
     niveis_soros = 0
     nivel_soros = 0
 
 valor_soros = 0
+
+if config['CICLOS']['usar_ciclo'].upper() == 'S':
+    ciclo = True
+    ciclo_nivel = int(config['CICLOS']['niveis_ciclo'])
+    ciclo_fator = float(config['CICLOS']['fator_ciclo'])
+    ciclo_executado = 0
+    ciclo_ultimo_valor = 0
+else:
+    ciclo = False
+    ciclo_nivel = 0
+    ciclo_fator = 0
+    ciclo_executado = 0
+    ciclo_ultimo_valor = 0
+
 lucro_op_atual = 0
 
 analise_medias = config['AJUSTES']['analise_medias']
@@ -178,7 +190,7 @@ def payout(par):
 
 ### Função abrir ordem e checar resultado ###
 def compra(ativo,valor_entrada,direcao,exp,tipo):
-    global stop,lucro_total, nivel_soros, niveis_soros, valor_soros, lucro_op_atual
+    global stop,lucro_total, nivel_soros, niveis_soros, valor_soros, lucro_op_atual, ciclo_executado, ciclo_nivel, ciclo_fator, ciclo_ultimo_valor
     print(f"Compra realizada: Ativo {melhor_par}, Entrada {valor_entrada}, Direção {direcao}, Expiração {exp}, Tipo {tipo}")
     
     if soros:
@@ -196,6 +208,15 @@ def compra(ativo,valor_entrada,direcao,exp,tipo):
     else:
         entrada = valor_entrada
 
+    if ciclo:
+        if ciclo_executado > 0 and ciclo_executado <= ciclo_nivel:
+            ciclo_valor = float(ciclo_ultimo_valor) * float(ciclo_fator)                       
+            entrada = round(abs(ciclo_valor), 2)
+        else:
+            ciclo_executado = 0
+
+    ciclo_ultimo_valor = entrada
+
     for i in range(martingale + 1):
 
         if stop == True:
@@ -205,15 +226,27 @@ def compra(ativo,valor_entrada,direcao,exp,tipo):
             else:
                 check, id = API.buy(entrada,ativo,direcao,exp)
 
-
             if check:
-                if i == 0: 
+                if i == 0 and ciclo_executado == 0: 
                     print('\n >> Ordem aberta \n',
                           yellow+'>> Par:',white,ativo,'\n',
                           yellow+'>> Direção:',white,direcao,'\n',
                           yellow+'>> Entrada de:',white,cifrao,entrada)
-                if i >= 1:
+                    
+                if i == 0 and ciclo_executado > 0: 
+                    print('\n >> Ordem aberta no ciclo ', ciclo_executado,'\n',
+                          yellow+'>> Par:',white,ativo,'\n',
+                          yellow+'>> Direção:',white,direcao,'\n',
+                          yellow+'>> Entrada de:',white,cifrao,entrada)
+                          
+                if i >= 1 and ciclo_executado == 0:
                     print('\n >> Ordem aberta para GALE',str(i),'\n',
+                          '>> Par:',ativo,'\n',
+                          '>> Direção:',direcao,'\n',
+                          '>> Entrada de:',cifrao,entrada)
+                    
+                if i >= 1 and ciclo_executado > 0:
+                    print('\n >> Ordem aberta para GALE ',str(i),' no ciclo ', ciclo_executado,'\n',
                           '>> Par:',ativo,'\n',
                           '>> Direção:',direcao,'\n',
                           '>> Entrada de:',cifrao,entrada)
@@ -240,6 +273,9 @@ def compra(ativo,valor_entrada,direcao,exp,tipo):
                                         yellow+'\n >> Lucro: '+white+ str(round(resultado,2))+
                                         yellow+'\n >> Par: '+white+ ativo+
                                         yellow+'\n >> Lucro total: '+ printar_lucro)
+                                    
+                            if ciclo:
+                                ciclo_executado = 0        
 
                         elif resultado == 0:
                             if i == 0:
@@ -258,6 +294,8 @@ def compra(ativo,valor_entrada,direcao,exp,tipo):
                                 gale = float(entrada)                   
                                 entrada = round(abs(gale), 2)
 
+                            if ciclo:
+                                ciclo_executado += 1
                         else:
                             if i == 0:
                                 print(red+'\n>> Resultado: LOSS ' +
@@ -271,9 +309,11 @@ def compra(ativo,valor_entrada,direcao,exp,tipo):
                                         yellow+'\n >> Lucro total: '+ printar_lucro)
                                 
                             if i+1 <= martingale:
-                                
                                 gale = float(entrada) * float(fator_mg)                           
-                                entrada = round(abs(gale), 2)
+                                entrada = round(abs(gale), 2)    
+
+                            if ciclo:
+                                ciclo_executado += 1                      
 
                         check_stop()
 

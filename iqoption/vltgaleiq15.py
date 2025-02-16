@@ -45,7 +45,6 @@ print(green+'''
                                    ██║   ██╔══██╗██╔══██║██║  ██║██╔══╝  ██╔══██╗
                                    ██║   ██║  ██║██║  ██║██████╔╝███████╗██║  ██║
                                    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝'''+yellow+'''
-                                                azkzero@gmail.com
 ''')
 print(yellow + '*********************************************************************************************************')
 print(light_blue+"=========================================================================================================")
@@ -342,7 +341,7 @@ def estrategia_LSTrader_Volatility(ativos, valor_entrada, tipo):
     qnt_velas = 3
     ativos = escolher_par_e_tipo_automatico(API, payout_minimo=70) # Substitua por ativos válidos
     print(yellow + '***************************************************************************************')
-    print("\n>>>Iniciando Logan Smith Trader_Volatility")
+    print("\n>>>Iniciando Trade4You_Volatility")
     
     while True:
         time.sleep(0.1)
@@ -773,7 +772,7 @@ nome = str(perfil['name'])
 valorconta = float(API.get_balance())
 
 print(yellow + '***************************************************************************************')
-print(green +'>>'+white+'  Logan Smith Trader -  Robô Volatilidade/Martingale') 
+print(green +'>>'+white+'  Trade4You -  Robô Volatilidade/Martingale') 
 print(green +'>>'+white+'  Olá, ',nome, ' Seja bem vindo.')
 print(green +'>>'+white+'  Seu Saldo na conta ',escolha, 'é de', cifrao,round(valorconta,2))
 print(green +'>>'+white+'  Seu valor de entrada é de ',cifrao,round(valor_entrada,2))
